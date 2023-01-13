@@ -1,0 +1,91 @@
+---
+title: "Constrained Kaplan-Meier Curve and Empirical Likelihood"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Constrained Kaplan–Meier curve and empirical likelihood}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+# Title: Demo, styles, refeneces, tables, formulas, R code
+
+The Kaplan–Meier curve and the namesake Kaplan–Meier 1958 paper is the most cited statistical paper in the history. We study the error analysis of the popular Kaplan–Meier curve. We describe in detail and recommend a method based on the calculation of constrained Kaplan–Meier curve and the recently developed Empirical Likelihood theory.
+
+
+Refences could be found in [^1] among many others.
+
+Styles (and bullet points): 
+
+- Bold: **ABCD**
+- Italic: *ABCD*
+- Key words: `key word` 
+
+
+Table example:
+
+| name | description |
+|:-----|:------------|
+| abcd | abcd.e      |
+
+
+An example of K-M and tilted K-M curve is illustrated in Figure 1.
+
+| ![figure1](./figures/example.jpeg) | 
+|:--:|
+| <b> Figure 1: K-M and tilted K-M curve </b> |
+
+If no caption is needed, then `![figure](figure_path)` could represent the figure.
+
+
+## Section: Formulas
+
+This program uses EM algorithm to compute the maximized (wrt $p_i$) empirical log likelihood function for right, left or doubly censored data with the MEAN constraint:
+
+$$sum_{d_i=1}  p_i f(x_i)  = \int f(t) dF(t) = mu .$$
+
+Where $p_i = \Delta F(x_i)$ is a probability, $d_i$ is the censoring indicator, 1(uncensored), 0(right censored), 2(left censored). It also returns those $p_i$.
+
+The empirical log likelihood been maximized is
+
+$$sum_{d_i=1} \log Delta F(x_i) + sum_{d_i=0} \log [1-F(x_i)] + sum_{d_i=2}  \log F(x_i) .$$
+
+## Section: R code 
+
+More document could be found [here](https://rmarkdown.rstudio.com/).
+
+```{r results = 'asis'}
+## example with tied observations
+library(emplik)
+library(knitr)
+x <- c(1, 1.5, 2, 3, 4, 5, 6, 5, 4, 1, 2, 4.5)
+d <- c(1,   1, 0, 1, 0, 1, 1, 1, 1, 0, 0,   1)
+result <- el.cen.EM(x,d,mu=3.5)
+plot(result$times, 1.- cumsum(result$prob), type='b', xlab = 'time', ylab = 'prob', main='Surv Prob')
+dt1 <- data.frame(Time = result$times, Prob = result$prob)
+kable(dt1, caption = "Example1: Simple constriant MLE")
+print(result)
+```
+
+One could enable `echo = FALSE or TRUE` per need (options are seperated by `,`).
+
+# For production
+
+In the `emplik` folder, run the following: 
+
+```{r eval = FALSE}
+library(devtools)
+document()
+build_vignettes()
+```
+
+# Reference 
+
+[1] Efron, Bradley. "Logistic regression, survival analysis, and the Kaplan-Meier curve." Journal of the American statistical Association 83, no. 402 (1988): 414-425.
